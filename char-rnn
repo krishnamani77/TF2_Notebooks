@@ -1,0 +1,243 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Untitled0.ipynb",
+      "provenance": [],
+      "authorship_tag": "ABX9TyMK+DSe3Wb+bP+GRbqRBrPF",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/krishnamani77/TF2_Notebooks/blob/master/char-rnn\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "aNNyW8VjQzdZ",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 51
+        },
+        "outputId": "d2ec0527-f81b-42fb-e86d-c418f9268351"
+      },
+      "source": [
+        "import keras\n",
+        "import keras.utils\n",
+        "\n",
+        "sh_url = 'https://homl.info/shakespeare'\n",
+        "sh_file = \"sh.txt\"\n",
+        "filepath = keras.utils.get_file(sh_file, sh_url)"
+      ],
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Downloading data from https://homl.info/shakespeare\n",
+            "1122304/1115394 [==============================] - 0s 0us/step\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "HyWSFNKuRTTF",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "with open(filepath) as f:\n",
+        "  sh_txt = f.read()  "
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "fgA5oflaRcAo",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "tokenizer = keras.preprocessing.text.Tokenizer(char_level=True)\n",
+        "tokenizer.fit_on_texts([sh_txt])"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "cChcuTZfRnWe",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 51
+        },
+        "outputId": "ea99a6e2-8eb2-4c98-b0b0-3b4244a877ef"
+      },
+      "source": [
+        "print(tokenizer.texts_to_sequences(['Hello world']))\n",
+        "print(tokenizer.sequences_to_texts([[7,2,12,12,4], [1,17,4,9,12,13]]))"
+      ],
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "[[7, 2, 12, 12, 4, 1, 17, 4, 9, 12, 13]]\n",
+            "['h e l l o', '  w o r l d']\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "S9BMxl8mRsZQ",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "b2d47a2b-04b4-4a8c-fe5e-b9b111a64586"
+      },
+      "source": [
+        "max_id = len(tokenizer.word_index)\n",
+        "print(max_id)"
+      ],
+      "execution_count": 13,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "39\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "WO1GsA_jSKX5",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 54
+        },
+        "outputId": "e8dd1bda-b90c-47e2-84c5-70981ffc5dc8"
+      },
+      "source": [
+        "print(tokenizer.word_index)"
+      ],
+      "execution_count": 14,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "{' ': 1, 'e': 2, 't': 3, 'o': 4, 'a': 5, 'i': 6, 'h': 7, 's': 8, 'r': 9, 'n': 10, '\\n': 11, 'l': 12, 'd': 13, 'u': 14, 'm': 15, 'y': 16, 'w': 17, ',': 18, 'c': 19, 'f': 20, 'g': 21, 'b': 22, 'p': 23, ':': 24, 'k': 25, 'v': 26, '.': 27, \"'\": 28, ';': 29, '?': 30, '!': 31, '-': 32, 'j': 33, 'q': 34, 'x': 35, 'z': 36, '3': 37, '&': 38, '$': 39}\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "tSyIvb8kSPaH",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "79a49751-230f-4248-d041-dc6151be49b6"
+      },
+      "source": [
+        "dataset_size = tokenizer.document_count\n",
+        "print(dataset_size)"
+      ],
+      "execution_count": 15,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "1\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "wMyVsR6ISXjI",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "import numpy as np\n",
+        "[encoded] = np.array(tokenizer.texts_to_sequences([sh_txt]))"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "QhH4J8Z5SqIf",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "b30e2621-fa0e-47c2-8ec1-952cb2fab42d"
+      },
+      "source": [
+        "print(encoded[10:20])"
+      ],
+      "execution_count": 20,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "[36  2 10 24 11 22  2 20  4  9]\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "5etbuiw0Sy6P",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": 0,
+      "outputs": []
+    }
+  ]
+}
